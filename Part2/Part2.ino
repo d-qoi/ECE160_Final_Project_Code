@@ -33,7 +33,7 @@
 * Public Constants
 *************************************************/
 #include "notes.h"
-
+#include <Charlieplex.h>
 
 #define CHOICE_OFF      0 //Used to control LEDs
 #define CHOICE_NONE     0 //Used to check buttons
@@ -66,6 +66,14 @@
 
 //Common LCD pins
 //LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+//Charlieplex
+byte pins[] = {LED_PIN_ONE, LED_PIN_TWO, LED_PIN_THREE};
+Charlieplex charlieplex = Charlieplex(pins, sizeof(pins));
+byte LED_GREEN = {};
+byte LED_RED = {};
+byte LED_YELLOW = {};
+BYTE LED_BLUE = {};
 
 // Game state variables
 byte gameMode = MODE_MEMORY; //By default, let's play the memory game
