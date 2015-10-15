@@ -54,7 +54,7 @@
 
 // Buzzer pin definitions
 #define BUZZER1  4
-#define BUZZER2  7
+//#define BUZZER2  7
 
 // Define game parameters
 #define ROUNDS_TO_WIN      13 //Number of rounds to succesfully remember before you win. 13 is do-able.
@@ -85,7 +85,7 @@ void setup()
   pinMode(LED_YELLOW, OUTPUT);
 
   pinMode(BUZZER1, OUTPUT);
-  pinMode(BUZZER2, OUTPUT);
+  //pinMode(BUZZER2, OUTPUT);
 
   //Mode checking
   gameMode = MODE_MEMORY; // By default, we're going to play the memory game
@@ -335,11 +335,11 @@ void buzz_sound(int buzz_length_ms, int buzz_delay_us)
 
     // Toggle the buzzer at various speeds
     digitalWrite(BUZZER1, LOW);
-    digitalWrite(BUZZER2, HIGH);
+    //digitalWrite(BUZZER2, HIGH);
     delayMicroseconds(buzz_delay_us);
 
     digitalWrite(BUZZER1, HIGH);
-    digitalWrite(BUZZER2, LOW);
+    //digitalWrite(BUZZER2, LOW);
     delayMicroseconds(buzz_delay_us);
   }
 }
@@ -366,11 +366,11 @@ void winner_sound(void)
   {
     for (byte y = 0 ; y < 3 ; y++)
     {
-      digitalWrite(BUZZER2, HIGH);
+     // digitalWrite(BUZZER2, HIGH);
       digitalWrite(BUZZER1, LOW);
       delayMicroseconds(x);
 
-      digitalWrite(BUZZER2, LOW);
+      //digitalWrite(BUZZER2, LOW);
       digitalWrite(BUZZER1, HIGH);
       delayMicroseconds(x);
     }
@@ -452,13 +452,13 @@ void play_beegees()
     // iterate over the notes of the melody:
     for (int thisNote = 0; thisNote < 32; thisNote++) {
       changeLED();
-      tone(BUZZER2, melody[thisNote],noteDuration);
+      //tone(BUZZER2, melody[thisNote],noteDuration);
       // to distinguish the notes, set a minimum time between them.
       // the note's duration + 30% seems to work well:
       int pauseBetweenNotes = noteDuration * 1.30;
       delay(pauseBetweenNotes);
       // stop the tone playing:
-      noTone(BUZZER2);
+     // noTone(BUZZER2);
     }
   }
 }
