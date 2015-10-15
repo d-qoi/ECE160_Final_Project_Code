@@ -34,6 +34,7 @@
 *************************************************/
 #include "notes.h"
 
+
 #define CHOICE_OFF      0 //Used to control LEDs
 #define CHOICE_NONE     0 //Used to check buttons
 #define CHOICE_RED  (1 << 0)
