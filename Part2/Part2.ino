@@ -37,14 +37,11 @@
 
 #define CHOICE_OFF      0 //Used to control LEDs
 #define CHOICE_NONE     0 //Used to check buttons
-#define CHOICE_RED      (1 << 0)
-#define CHOICE_GREEN    (1 << 1)
-#define CHOICE_BLUE     (1 << 2)
-#define CHOICE_YELLOW   (1 << 3)
+#define CHOICE_RED      (1 << 0) //00011
+#define CHOICE_GREEN    (1 << 1) //00110
+#define CHOICE_BLUE     (1 << 2) //01100
+#define CHOICE_YELLOW   (1 << 3) //11000
 
-#define LED_PIN_ONE   6
-#define LED_PIN_TWO   7
-#define LED_PIN_THREE 8
 
 // Button pin definitions
 #define BUTTON_RED    A0
@@ -60,20 +57,27 @@
 #define ROUNDS_TO_WIN      13 //Number of rounds to succesfully remember before you win. 13 is do-able.
 #define ENTRY_TIME_LIMIT   3000 //Amount of time to press a button before game times out. 3000ms = 3 sec
 
-#define MODE_MEMORY  0
-#define MODE_BATTLE  1
-#define MODE_BEEGEES 2
+#define MODE_MEMORY  1
+#define MODE_BATTLE  2
+#define MODE_BEEGEES 3
+#define MODE_REVERSE 4
 
 //Common LCD pins
 //LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 //Charlieplex
+byte LED_PIN_ONE = 6;
+byte LED_PIN_TWO = 7;
+byte LED_PIN_THREE = 8;
+
 byte pins[] = {LED_PIN_ONE, LED_PIN_TWO, LED_PIN_THREE};
-Charlieplex charlieplex = Charlieplex(pins, sizeof(pins));
-byte LED_GREEN = {};
-byte LED_RED = {};
-byte LED_YELLOW = {};
-BYTE LED_BLUE = {};
+Charlieplex charlie = Charlieplex(pins, sizeof(pins));
+
+charliePin LED_RED = {0, 1};
+charliePin LED_GREEN = {1, 0};
+charliePin LED_YELLOW = {2, 1};
+charliePin LED_BLUE = {1, 2};
+
 
 // Game state variables
 byte gameMode = MODE_MEMORY; //By default, let's play the memory game
@@ -90,10 +94,10 @@ void setup()
   pinMode(BUTTON_BLUE, INPUT_PULLUP);
   pinMode(BUTTON_YELLOW, INPUT_PULLUP);
 
-  pinMode(LED_RED, OUTPUT);
-  pinMode(LED_GREEN, OUTPUT);
-  pinMode(LED_BLUE, OUTPUT);
-  pinMode(LED_YELLOW, OUTPUT);
+  //pinMode(LED_RED, OUTPUT);
+  //pinMode(LED_GREEN, OUTPUT);
+  //pinMode(LED_BLUE, OUTPUT);
+  //pinMode(LED_YELLOW, OUTPUT);
 
   pinMode(BUZZER1, OUTPUT);
   //pinMode(BUZZER2, OUTPUT);
@@ -102,10 +106,20 @@ void setup()
   gameMode = MODE_MEMORY; // By default, we're going to play the memory game
 
   // Check to see if the lower right button is pressed
-  if (checkButton() == CHOICE_YELLOW) play_beegees();
+  byte buttonchoice = checkButton();
+
+  if (buttonchoice == CHOICE_YELLOW) {
+    gameMode = MODE_BEEGEES;
+    setLEDs(CHOICE_YELLOW);
+    toner(CHOICE_YELLOW,150);
+
+    while(checkButton() != CHOICE_NONE) ;
+
+  }
+
 
   // Check to see if upper right button is pressed
-  if (checkButton() == CHOICE_GREEN)
+  else if (buttonchoice == CHOICE_GREEN)
   {
     gameMode = MODE_BATTLE; //Put game into battle mode
 
@@ -113,7 +127,7 @@ void setup()
     setLEDs(CHOICE_GREEN);
     toner(CHOICE_GREEN, 150);
 
-    setLEDs(CHOICE_RED | CHOICE_BLUE | CHOICE_YELLOW); // Turn on the other LEDs until you release button
+    //setLEDs(CHOICE_RED | CHOICE_BLUE | CHOICE_YELLOW); // Turn on the other LEDs until you release button
 
     while(checkButton() != CHOICE_NONE) ; // Wait for user to stop pressing button
 
@@ -128,25 +142,51 @@ void loop()
   attractMode(); // Blink lights while waiting for user to press a button
 
   // Indicate the start of game play
-  setLEDs(CHOICE_RED | CHOICE_GREEN | CHOICE_BLUE | CHOICE_YELLOW); // Turn all LEDs on
-  delay(1000);
-  setLEDs(CHOICE_OFF); // Turn off LEDs
-  delay(250);
+  //setLEDs(CHOICE_RED | CHOICE_GREEN | CHOICE_BLUE | CHOICE_YELLOW); // Turn all LEDs on
+  //delay(1000);
+  //setLEDs(CHOICE_OFF); // Turn off LEDs
+  //delay(250);
 
   if (gameMode == MODE_MEMORY)
   {
     // Play memory game and handle result
+    setLEDs(CHOICE_RED);
+    delay(1000);
+    setLEDs(CHOICE_OFF);
+    delay(250);
     if (play_memory() == true) 
       play_winner(); // Player won, play winner tones
     else 
       play_loser(); // Player lost, play loser tones
   }
 
-  if (gameMode == MODE_BATTLE)
+  else if (gameMode == MODE_BATTLE)
   {
+    setLEDs(CHOICE_GREEN);
+    delay(1000);
+    setLEDs(CHOICE_OFF);
+    delay(250);
     play_battle(); // Play game until someone loses
 
     play_loser(); // Player lost, play loser tones
+  }
+
+  else if(gameMode == MODE_BEEGEES) {
+    setLEDs(CHOICE_YELLOW);
+    delay(1000);
+    setLEDs(CHOICE_OFF);
+    delay(250);
+
+    play_beegees();
+    play_loser();
+
+  }
+
+  if(gameMode == MODE_REVERSE) {
+    setLEDs(CHOICE_BLUE);
+    delay(1000);
+    setLEDs(CHOICE_OFF);
+    delay(250);
   }
 }
 
@@ -244,6 +284,46 @@ void add_to_moves(void)
 
 // Lights a given LEDs
 // Pass in a byte that is made up from CHOICE_RED, CHOICE_YELLOW, etc
+//integrate Charlieplex Here.
+
+//Changes:
+/*
+I, Alex, swapped the digitalWrite with charlie.charlieWrite
+All of the other code for this is the same.
+When looking at the same lines in the part one, or the example that this is copied from, 
+
+charlie.charlieWrite(LED_RED, HIGH);
+is 
+digitalWrite(ED_RED, HIGH);
+
+*/
+
+
+void setLEDs(byte leds)
+{
+  charlie.clear();
+  if ((leds & CHOICE_RED) != 0)
+    charlie.charlieWrite(LED_RED, HIGH);
+  else
+    charlie.charlieWrite(LED_RED, LOW);
+
+  if ((leds & CHOICE_GREEN) != 0)
+    charlie.charlieWrite(LED_GREEN, HIGH);
+  else
+    charlie.charlieWrite(LED_GREEN, LOW);
+
+  if ((leds & CHOICE_BLUE) != 0)
+    charlie.charlieWrite(LED_BLUE, HIGH);
+  else
+    charlie.charlieWrite(LED_BLUE, LOW);
+
+  if ((leds & CHOICE_YELLOW) != 0)
+   charlie.charlieWrite(LED_YELLOW, HIGH);
+  else
+    charlie.charlieWrite(LED_YELLOW, LOW);
+}
+/*
+//This code will no longer function
 void setLEDs(byte leds)
 {
   if ((leds & CHOICE_RED) != 0)
@@ -266,6 +346,7 @@ void setLEDs(byte leds)
   else
     digitalWrite(LED_YELLOW, LOW);
 }
+*/
 
 // Wait for a button to be pressed. 
 // Returns one of LED colors (LED_RED, etc.) if successful, 0 if timed out
@@ -433,9 +514,10 @@ void attractMode(void)
 // Notes in the melody. Each note is about an 1/8th note, "0"s are rests.
 int melody[] = {
   NOTE_G4, NOTE_A4, 0, NOTE_C5, 0, 0, NOTE_G4, 0, 0, 0,
-  NOTE_E4, 0, NOTE_D4, NOTE_E4, NOTE_G4, 0,
+  NOTE_E4, 0, NOTE_D4, NOTE_E4, NOTE_G4, 0,\
   NOTE_D4, NOTE_E4, 0, NOTE_G4, 0, 0,
   NOTE_D4, 0, NOTE_E4, 0, NOTE_G4, 0, NOTE_A4, 0, NOTE_C5, 0};
+int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370};
 
 int noteDuration = 115; // This essentially sets the tempo, 115 is just about right for a disco groove :)
 int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
@@ -444,10 +526,11 @@ int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
 // This function is activated when user holds bottom right button during power up
 void play_beegees()
 {
+
+  //int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370};
   //Turn on the bottom right (yellow) LED
   setLEDs(CHOICE_YELLOW);
   toner(CHOICE_YELLOW, 150);
-
   setLEDs(CHOICE_RED | CHOICE_GREEN | CHOICE_BLUE); // Turn on the other LEDs until you release button
 
   while(checkButton() != CHOICE_NONE) ; // Wait for user to stop pressing button
@@ -457,20 +540,28 @@ void play_beegees()
   delay(1000); // Wait a second before playing song
 
   digitalWrite(BUZZER1, LOW); // setup the "BUZZER1" side of the buzzer to stay low, while we play the tone on the other pin.
-
+  int haltStong = CHOICE_NONE;
   while(checkButton() == CHOICE_NONE) //Play song until you press a button
   {
     // iterate over the notes of the melody:
     for (int thisNote = 0; thisNote < 32; thisNote++) {
       changeLED();
-      //tone(BUZZER2, melody[thisNote],noteDuration);
+       //noTone(BUZZER1);
+      tone(BUZZER1, melody[thisNote],noteDuration);
       // to distinguish the notes, set a minimum time between them.
       // the note's duration + 30% seems to work well:
-      int pauseBetweenNotes = noteDuration * 1.30;
-      delay(pauseBetweenNotes);
+      int pauseBetweenNote=noteDuration*1.30;
+
+
+      //tone(BUZZER1, notes[thisNote], 250);
+      delay(pauseBetweenNote);
+      haltStong = checkButton();
+      //delay(300);
       // stop the tone playing:
-     // noTone(BUZZER2);
+
+     
     }
+    //noTone(BUZZER1);
   }
 }
 
