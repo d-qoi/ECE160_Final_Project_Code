@@ -54,7 +54,7 @@
 //#define BUZZER2  7
 
 // Define game parameters
-#define ROUNDS_TO_WIN      13 //Number of rounds to succesfully remember before you win. 13 is do-able.
+#define ROUNDS_TO_WIN      5 //Number of rounds to succesfully remember before you win. 13 is do-able.
 #define ENTRY_TIME_LIMIT   3000 //Amount of time to press a button before game times out. 3000ms = 3 sec
 
 #define MODE_MEMORY  1
@@ -514,10 +514,23 @@ void attractMode(void)
 // Notes in the melody. Each note is about an 1/8th note, "0"s are rests.
 int melody[] = {
   NOTE_G4, NOTE_A4, 0, NOTE_C5, 0, 0, NOTE_G4, 0, 0, 0,
-  NOTE_E4, 0, NOTE_D4, NOTE_E4, NOTE_G4, 0,\
+  NOTE_E4, 0, NOTE_D4, NOTE_E4, NOTE_G4, 0,
   NOTE_D4, NOTE_E4, 0, NOTE_G4, 0, 0,
   NOTE_D4, 0, NOTE_E4, 0, NOTE_G4, 0, NOTE_A4, 0, NOTE_C5, 0};
 int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370};
+
+int Sweater[] = {
+  0,0,0, NOTE_B4, NOTE_C4, NOTE_C4, NOTE_B4, NOTE_D4,
+  NOTE_C4, NOTE_C4, 0, 0, NOTE_C4, NOTE_C4, NOTE_B4, NOTE_D4,
+  NOTE_D4, NOTE_D4, 0, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_B4, NOTE_D4
+};
+
+int axel_f[] = {
+  NOTE_F4, NOTE_F4, 0, 0, NOTE_GS4, NOTE_GS4, 0, NOTE_F4, 0, NOTE_F4, NOTE_AS4, 0, NOTE_F4, 0, NOTE_DS4, 0,
+  NOTE_F4, NOTE_F4, 0, 0, NOTE_C5, NOTE_C5, 0, NOTE_F4, 0, NOTE_F4, NOTE_CS4, 0, NOTE_C5, 0, NOTE_GS4, 0,
+  NOTE_F4, 0, NOTE_C5, 0, NOTE_F5, 0, NOTE_F4, NOTE_DS4, 0, NOTE_DS4, NOTE_C4, 0, NOTE_G4, 0,
+  NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
 
 int noteDuration = 115; // This essentially sets the tempo, 115 is just about right for a disco groove :)
 int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
@@ -541,16 +554,21 @@ void play_beegees()
 
   digitalWrite(BUZZER1, LOW); // setup the "BUZZER1" side of the buzzer to stay low, while we play the tone on the other pin.
   int haltStong = CHOICE_NONE;
+  int pauseBetweenNote=noteDuration;
   while(checkButton() == CHOICE_NONE) //Play song until you press a button
   {
     // iterate over the notes of the melody:
-    for (int thisNote = 0; thisNote < 32; thisNote++) {
+    for (int thisNote = 0; thisNote < 62; thisNote++) {
       changeLED();
        //noTone(BUZZER1);
-      tone(BUZZER1, melody[thisNote],noteDuration);
+      if(axel_f[thisNote] == 0) {
+        noTone(BUZZER1);
+      }else {
+        tone(BUZZER1, axel_f[thisNote]);
+      }
       // to distinguish the notes, set a minimum time between them.
       // the note's duration + 30% seems to work well:
-      int pauseBetweenNote=noteDuration*1.30;
+     
 
 
       //tone(BUZZER1, notes[thisNote], 250);
