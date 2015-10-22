@@ -522,14 +522,7 @@ int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370
 int Sweater[] = {
   0,0,0, NOTE_B5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5,
   NOTE_C5, NOTE_C5, 0, 0, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5,
-  NOTE_D5, NOTE_D5, 0, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5,
-  NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5, NOTE_D5, NOTE_D5, 0, NOTE_B5,
-  NOTE_C5, NOTE_C5, NOTE_D5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_G4, NOTE_B5,
-  NOTE_C5, NOTE_B5, NOTE_G4, NOTE_B5, NOTE_B5, NOTE_B5, NOTE_G4, NOTE_G4,
-  NOTE_C5, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_C5, 0
-   
-  
-
+  NOTE_D5, NOTE_D5, 0, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5
 };
 
 int axel_f[] = {
@@ -538,14 +531,8 @@ int axel_f[] = {
   NOTE_F4, 0, NOTE_C5, 0, NOTE_F5, 0, NOTE_F4, NOTE_DS4, 0, NOTE_DS4, NOTE_C4, 0, NOTE_G4, 0,
   NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-int Pirate[] = {
-  NOTE_F4, NOTE_F4, 0, 0, NOTE_GS4, NOTE_GS4, 0, NOTE_F4, 0, NOTE_F4, NOTE_AS4, 0, NOTE_F4, 0, NOTE_DS4, 0,
-  NOTE_F4, NOTE_F4, 0, 0, NOTE_C5, NOTE_C5, 0, NOTE_F4, 0, NOTE_F4, NOTE_CS4, 0, NOTE_C5, 0, NOTE_GS4, 0,
-  NOTE_F4, 0, NOTE_C5, 0, NOTE_F5, 0, NOTE_F4, NOTE_DS4, 0, NOTE_DS4, NOTE_C4, 0, NOTE_G4, 0,
-  NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
 
-int noteDuration = 150; // This essentially sets the tempo, 115 is just about right for a disco groove :)
+int noteDuration = 80; // This essentially sets the tempo, 115 is just about right for a disco groove :)
 int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
 
 // Do nothing but play bad beegees music
@@ -571,7 +558,7 @@ void play_beegees()
   while(checkButton() == CHOICE_NONE) //Play song until you press a button
   {
     // iterate over the notes of the melody:
-    for (int thisNote = 0; thisNote < 50; thisNote++) {
+    for (int thisNote = 0; thisNote < 24; thisNote++) {
       changeLED();
        //noTone(BUZZER1);
       if(Sweater[thisNote] == 0) {
