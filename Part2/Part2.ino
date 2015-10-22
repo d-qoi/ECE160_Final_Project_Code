@@ -545,7 +545,7 @@ int Pirate[] = {
   NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-int noteDuration = 150; // This essentially sets the tempo, 115 is just about right for a disco groove :)
+int noteDuration = 115; // This essentially sets the tempo, 115 is just about right for a disco groove :)
 int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
 
 // Do nothing but play bad beegees music
@@ -571,13 +571,13 @@ void play_beegees()
   while(checkButton() == CHOICE_NONE) //Play song until you press a button
   {
     // iterate over the notes of the melody:
-    for (int thisNote = 0; thisNote < 50; thisNote++) {
+    for (int thisNote = 0; thisNote < 62; thisNote++) {
       changeLED();
        //noTone(BUZZER1);
-      if(Sweater[thisNote] == 0) {
+      if(axel_f[thisNote] == 0) {
         noTone(BUZZER1);
       }else {
-        tone(BUZZER1, Sweater[thisNote]);
+        tone(BUZZER1, axel_f[thisNote]);
       }
       // to distinguish the notes, set a minimum time between them.
       // the note's duration + 30% seems to work well:

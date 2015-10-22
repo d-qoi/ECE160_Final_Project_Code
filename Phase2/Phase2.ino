@@ -1,3 +1,4 @@
+
 /*
  SparkFun Inventor's Kit
  Example sketch 16
@@ -34,6 +35,7 @@
 *************************************************/
 #include "notes.h"
 #include <Charlieplex.h>
+#include <LiquidCrystal.h>
 
 #define CHOICE_OFF      0 //Used to control LEDs
 #define CHOICE_NONE     0 //Used to check buttons
@@ -78,6 +80,14 @@ charliePin LED_GREEN = {1, 0};
 charliePin LED_YELLOW = {2, 1};
 charliePin LED_BLUE = {1, 2};
 
+//Lcd VARS, displayed and otherwise.
+LiquidCrystal lcd(3, 5, 9, 10 , 12, 13);
+int gameNumber = 0;
+int lengthOfGame = 0;
+int numberOfGamesWon = 0;
+int numberOfGamesLost = 0;
+bool turn = false;
+
 
 // Game state variables
 byte gameMode = MODE_MEMORY; //By default, let's play the memory game
@@ -94,13 +104,11 @@ void setup()
   pinMode(BUTTON_BLUE, INPUT_PULLUP);
   pinMode(BUTTON_YELLOW, INPUT_PULLUP);
 
-  //pinMode(LED_RED, OUTPUT);
-  //pinMode(LED_GREEN, OUTPUT);
-  //pinMode(LED_BLUE, OUTPUT);
-  //pinMode(LED_YELLOW, OUTPUT);
 
   pinMode(BUZZER1, OUTPUT);
-  //pinMode(BUZZER2, OUTPUT);
+
+  //LCD setup
+  lcd.begin(16, 2);
 
   //Mode checking
   gameMode = MODE_MEMORY; // By default, we're going to play the memory game
@@ -592,3 +600,15 @@ void changeLED(void)
   if(LEDnumber > 3) LEDnumber = 0; // Wrap the counter if needed
 }
 
+//Controlling the LCD, or at least updating it
+void updateLCD() {
+  lcd.clear()
+  lcd.setCursor(0,0);
+  lcd.print("Game: ")
+  lcd.print(gameNumber);
+  lcd.print(" Len: ");
+  lcd.print(lengthOfGame);
+
+  lcd.setCursor(1,0);
+  
+}
