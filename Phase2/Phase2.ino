@@ -155,6 +155,8 @@ void setup()
 
 void loop()
 {
+  lengthOfGame = 0;
+  gameNumber++;
   attractMode(); // Blink lights while waiting for user to press a button
 
   // Indicate the start of game play
@@ -166,7 +168,8 @@ void loop()
   if (gameMode == MODE_MEMORY)
   {
     // Play memory game and handle result
-    gameNumber++;
+    
+    //displayName({'M','e','m','o','r','y'});
     setLEDs(CHOICE_RED);
     delay(1000);
     setLEDs(CHOICE_OFF);
@@ -179,6 +182,7 @@ void loop()
       play_loser(); // Player lost, play loser tones
       numberOfGamesLost++;
     }
+    updateLCD();
   }
 
   else if (gameMode == MODE_BATTLE)
@@ -188,8 +192,13 @@ void loop()
     setLEDs(CHOICE_OFF);
     delay(250);
     play_battle(); // Play game until someone loses
-
+    if(turn) {
+      numberOfGamesWon++;
+    } else {
+      numberOfGamesLost++;
+    }
     play_loser(); // Player lost, play loser tones
+    updateLCDBattle();
   }
 
   else if(gameMode == MODE_BEEGEES) {
@@ -200,6 +209,7 @@ void loop()
 
     play_beegees();
     play_loser();
+    updateLCD();
 
   }
 
@@ -208,7 +218,9 @@ void loop()
     delay(1000);
     setLEDs(CHOICE_OFF);
     delay(250);
+    updateLCD();
   }
+  //updateLCD();
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -252,13 +264,17 @@ boolean play_memory(void)
 boolean play_battle(void)
 {
   gameRound = 0; // Reset the game frame back to one frame
-
+  lengthOfGame = 0;
+  turn = false;
+  updateLCDBattle();
   while (1) // Loop until someone fails 
   {
     byte newButton = wait_for_button(); // Wait for user to input next move
     gameBoard[gameRound++] = newButton; // Add this new button to the game array
-
+    turn = !turn;
+    lengthOfGame++;
     // Then require the player to repeat the sequence.
+    updateLCDBattle();
     for (byte currentMove = 0 ; currentMove < gameRound ; currentMove++)
     {
       byte choice = wait_for_button();
@@ -269,6 +285,8 @@ boolean play_battle(void)
     }
 
     delay(100); // Give the user an extra 100ms to hand the game to the other player
+    
+    
   }
 
   return true; // We should never get here
@@ -563,7 +581,7 @@ int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
 // This function is activated when user holds bottom right button during power up
 void play_beegees()
 {
-
+  updateLCD();  
   //int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370};
   //Turn on the bottom right (yellow) LED
   setLEDs(CHOICE_YELLOW);
@@ -581,6 +599,7 @@ void play_beegees()
   int pauseBetweenNote=noteDuration;
   while(checkButton() == CHOICE_NONE) //Play song until you press a button
   {
+    gameNumber++;
     // iterate over the notes of the melody:
     for (int thisNote = 0; thisNote < axel_f_len; thisNote++) {
       changeLED();
@@ -604,6 +623,7 @@ void play_beegees()
      
     }
     //noTone(BUZZER1);
+    updateLCD();
   }
 }
 
@@ -625,10 +645,35 @@ void updateLCD() {
   lcd.print(" Len: ");
   lcd.print(lengthOfGame);
 
-  lcd.setCursor(1,0);
+  lcd.setCursor(0,1);
   lcd.print("Won: ");
   lcd.print(numberOfGamesWon);
-  lcd.print("Lost: ");
+  lcd.print(" Lost: ");
   lcd.print(numberOfGamesLost);
   
 }
+
+void updateLCDBattle() {
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Game: ");
+  lcd.print(gameNumber);
+  lcd.print(" Len: ");
+  lcd.print(lengthOfGame);
+
+  lcd.setCursor(0,1);
+  lcd.print("P1: ");
+  lcd.print(numberOfGamesWon);
+  lcd.print(" P2: ");
+  lcd.print(numberOfGamesLost);
+  lcd.setCursor(14,1);
+  lcd.print("P");
+  lcd.print(turn+1);
+}
+/*
+void displayName(String gameName[]) {
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print(gameName);
+}
+*/
