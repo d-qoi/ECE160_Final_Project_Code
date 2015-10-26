@@ -5,10 +5,10 @@
  Spark Fun Electronics
  Oct. 7, 2014
 
- Simon Says is a memory game. Start the game by pressing one of the four buttons. When a button lights up, 
- press the button, repeating the sequence. The sequence will get longer and longer. The game is won after 
- 13 rounds.
-
+ Simond Says is a memory game. Start this game by pressing one of the four buttons. When a button lights up, 
+ press the button, reversing the sequence. The sequence will get longer and longer. This game is won after 
+ 72 rounds.
+ 
  Generates random sequence, plays music, and displays button lights.
 
  Simon tones from Wikipedia
@@ -110,6 +110,12 @@ void setup()
   //LCD setup
   lcd.begin(16, 2);
 
+  int gameNumber = 0;
+  int lengthOfGame = 0;
+  int numberOfGamesWon = 0;
+  int numberOfGamesLost = 0;
+  bool turn = false;
+
   //Mode checking
   gameMode = MODE_MEMORY; // By default, we're going to play the memory game
 
@@ -143,6 +149,8 @@ void setup()
   }
 
   play_winner(); // After setup is complete, say hello to the world
+
+  updateLCD();
 }
 
 void loop()
@@ -158,14 +166,19 @@ void loop()
   if (gameMode == MODE_MEMORY)
   {
     // Play memory game and handle result
+    gameNumber++;
     setLEDs(CHOICE_RED);
     delay(1000);
     setLEDs(CHOICE_OFF);
     delay(250);
-    if (play_memory() == true) 
+    if (play_memory() == true) {
       play_winner(); // Player won, play winner tones
-    else 
+      numberOfGamesWon++;
+    }
+    else {
       play_loser(); // Player lost, play loser tones
+      numberOfGamesLost++;
+    }
   }
 
   else if (gameMode == MODE_BATTLE)
@@ -224,7 +237,8 @@ boolean play_memory(void)
 
       if (choice != gameBoard[currentMove]) return false; // If the choice is incorect, player loses
     }
-
+    lengthOfGame++;
+    updateLCD();
     delay(1000); // Player was correct, delay before playing moves
   }
 
@@ -406,16 +420,16 @@ void toner(byte which, int buzz_length_ms)
   switch(which) 
   {
   case CHOICE_RED:
-    buzz_sound(buzz_length_ms, 1136); 
+    buzz_sound(buzz_length_ms, 1130); 
     break;
   case CHOICE_GREEN:
-    buzz_sound(buzz_length_ms, 568); 
+    buzz_sound(buzz_length_ms, 570); 
     break;
   case CHOICE_BLUE:
-    buzz_sound(buzz_length_ms, 851); 
+    buzz_sound(buzz_length_ms, 850); 
     break;
   case CHOICE_YELLOW:
-    buzz_sound(buzz_length_ms, 638); 
+    buzz_sound(buzz_length_ms, 640); 
     break;
   }
 
@@ -537,10 +551,12 @@ int axel_f[] = {
   NOTE_F4, NOTE_F4, 0, 0, NOTE_GS4, NOTE_GS4, 0, NOTE_F4, 0, NOTE_F4, NOTE_AS4, 0, NOTE_F4, 0, NOTE_DS4, 0,
   NOTE_F4, NOTE_F4, 0, 0, NOTE_C5, NOTE_C5, 0, NOTE_F4, 0, NOTE_F4, NOTE_CS4, 0, NOTE_C5, 0, NOTE_GS4, 0,
   NOTE_F4, 0, NOTE_C5, 0, NOTE_F5, 0, NOTE_F4, NOTE_DS4, 0, NOTE_DS4, NOTE_C4, 0, NOTE_G4, 0,
-  NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
 };
 
-int noteDuration = 80; // This essentially sets the tempo, 115 is just about right for a disco groove :)
+int axel_f_len = 16*4;
+
+int noteDuration = 115; // This essentially sets the tempo, 115 is just about right for a disco groove :)
 int LEDnumber = 0; // Keeps track of which LED we are on during the beegees loop
 
 // Do nothing but play bad beegees music
@@ -566,13 +582,13 @@ void play_beegees()
   while(checkButton() == CHOICE_NONE) //Play song until you press a button
   {
     // iterate over the notes of the melody:
-    for (int thisNote = 0; thisNote < 24; thisNote++) {
+    for (int thisNote = 0; thisNote < axel_f_len; thisNote++) {
       changeLED();
        //noTone(BUZZER1);
-      if(Sweater[thisNote] == 0) {
+      if(axel_f[thisNote] == 0) {
         noTone(BUZZER1);
       }else {
-        tone(BUZZER1, Sweater[thisNote]);
+        tone(BUZZER1, axel_f[thisNote]);
       }
       // to distinguish the notes, set a minimum time between them.
       // the note's duration + 30% seems to work well:
@@ -602,13 +618,17 @@ void changeLED(void)
 
 //Controlling the LCD, or at least updating it
 void updateLCD() {
-  lcd.clear()
+  lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("Game: ")
+  lcd.print("Game: ");
   lcd.print(gameNumber);
   lcd.print(" Len: ");
   lcd.print(lengthOfGame);
 
   lcd.setCursor(1,0);
+  lcd.print("Won: ");
+  lcd.print(numberOfGamesWon);
+  lcd.print("Lost: ");
+  lcd.print(numberOfGamesLost);
   
 }

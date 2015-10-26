@@ -4,9 +4,9 @@
  Spark Fun Electronics
  Oct. 7, 2014
 
- Simon Says is a memory game. Start the game by pressing one of the four buttons. When a button lights up, 
- press the button, repeating the sequence. The sequence will get longer and longer. The game is won after 
- 13 rounds.
+ Simond Says is a memory game. Start this game by pressing one of the four buttons. When a button lights up, 
+ press the button, reversing the sequence. The sequence will get longer and longer. This game is won after 
+ 72 rounds.
 
  Generates random sequence, plays music, and displays button lights.
 
@@ -398,16 +398,16 @@ void toner(byte which, int buzz_length_ms)
   switch(which) 
   {
   case CHOICE_RED:
-    buzz_sound(buzz_length_ms, 1136); 
+    buzz_sound(buzz_length_ms, 1130); 
     break;
   case CHOICE_GREEN:
-    buzz_sound(buzz_length_ms, 568); 
+    buzz_sound(buzz_length_ms, 570); 
     break;
   case CHOICE_BLUE:
-    buzz_sound(buzz_length_ms, 851); 
+    buzz_sound(buzz_length_ms, 850); 
     break;
   case CHOICE_YELLOW:
-    buzz_sound(buzz_length_ms, 638); 
+    buzz_sound(buzz_length_ms, 640); 
     break;
   }
 
