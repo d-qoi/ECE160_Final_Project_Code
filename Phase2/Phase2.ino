@@ -52,7 +52,7 @@
 #define BUTTON_YELLOW A3
 
 // Buzzer pin definitions
-#define BUZZER1  4
+#define BUZZER1  6
 //#define BUZZER2  7
 
 // Define game parameters
@@ -68,9 +68,9 @@
 //LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 //Charlieplex
-byte LED_PIN_ONE = 6;
-byte LED_PIN_TWO = 7;
-byte LED_PIN_THREE = 8;
+byte LED_PIN_ONE = 7;
+byte LED_PIN_TWO = 8;
+byte LED_PIN_THREE = 9;
 
 byte pins[] = {LED_PIN_ONE, LED_PIN_TWO, LED_PIN_THREE};
 Charlieplex charlie = Charlieplex(pins, sizeof(pins));
@@ -81,7 +81,7 @@ charliePin LED_YELLOW = {2, 1};
 charliePin LED_BLUE = {1, 2};
 
 //Lcd VARS, displayed and otherwise.
-LiquidCrystal lcd(3, 5, 9, 10 , 12, 13);
+LiquidCrystal lcd(12,11,5,4,3,2);
 int gameNumber = 0;
 int lengthOfGame = 0;
 int numberOfGamesWon = 0;
