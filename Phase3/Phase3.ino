@@ -1,4 +1,3 @@
-
 /*
  SparkFun Inventor's Kit
  Example sketch 16
@@ -33,19 +32,20 @@
 /*************************************************
 * Public Constants
 *************************************************/
-#include "notes.h"
+#include "notes.h" //The notes that usually are defined have been moved to another file for sake of cleaning up code.
 #include <Charlieplex.h>
 #include <LiquidCrystal.h>
 
 #define CHOICE_OFF      0 //Used to control LEDs
 #define CHOICE_NONE     0 //Used to check buttons
-#define CHOICE_RED      (1 << 0) //00011
-#define CHOICE_GREEN    (1 << 1) //00110
-#define CHOICE_BLUE     (1 << 2) //01100
-#define CHOICE_YELLOW   (1 << 3) //11000
+#define CHOICE_RED      (1 << 0) //00001
+#define CHOICE_GREEN    (1 << 1) //00010
+#define CHOICE_BLUE     (1 << 2) //00100
+#define CHOICE_YELLOW   (1 << 3) //01000
 
 
 // Button pin definitions
+//Using the Analog pins as Digital pins for cable management
 #define BUTTON_RED    A0
 #define BUTTON_GREEN  A1
 #define BUTTON_BLUE   A2
@@ -53,7 +53,6 @@
 
 // Buzzer pin definitions
 #define BUZZER1  6
-//#define BUZZER2  7
 
 // Define game parameters
 #define ROUNDS_TO_WIN      13 //Number of rounds to succesfully remember before you win. 13 is do-able.
@@ -64,29 +63,29 @@
 #define MODE_BEEGEES 3
 #define MODE_REVERSE 4
 
-//Common LCD pins
-//LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
-
 //Charlieplex
+//setup of the clarlie plexed LEDs, three pins for more than three combonations.
 byte LED_PIN_ONE = 7;
 byte LED_PIN_TWO = 8;
 byte LED_PIN_THREE = 9;
-
 byte pins[] = {LED_PIN_ONE, LED_PIN_TWO, LED_PIN_THREE};
+
 Charlieplex charlie = Charlieplex(pins, sizeof(pins));
 
-charliePin LED_RED = {0, 1};
+charliePin LED_RED = {0, 1}; //refrence location in pins array, not pin location on board
 charliePin LED_GREEN = {1, 0};
 charliePin LED_YELLOW = {2, 1};
 charliePin LED_BLUE = {1, 2};
 
 //Lcd VARS, displayed and otherwise.
 LiquidCrystal lcd(12,11,5,4,3,2);
+
+//global variables for what is to be displayed by the LCD
 int gameNumber = 0;
 int lengthOfGame = 0;
 int numberOfGamesWon = 0;
 int numberOfGamesLost = 0;
-bool turn = false;
+bool turn = false; //false == player_1, true==player_2
 
 
 // Game state variables
@@ -99,17 +98,19 @@ void setup()
   //Setup hardware inputs/outputs. These pins are defined in the hardware_versions header file
 
   //Enable pull ups on inputs
+  //lets the buttons be used without the resistor
   pinMode(BUTTON_RED, INPUT_PULLUP);
   pinMode(BUTTON_GREEN, INPUT_PULLUP);
   pinMode(BUTTON_BLUE, INPUT_PULLUP);
   pinMode(BUTTON_YELLOW, INPUT_PULLUP);
 
-
+  //buzzer setup
   pinMode(BUZZER1, OUTPUT);
 
   //LCD setup
   lcd.begin(16, 2);
 
+  //reset the variables, just in case, also unnecessary.
   int gameNumber = 0;
   int lengthOfGame = 0;
   int numberOfGamesWon = 0;
@@ -117,17 +118,18 @@ void setup()
   bool turn = false;
 
   //Mode checking
+  // mode_memory is choice_red, that is not checked below as that is the default.
   gameMode = MODE_MEMORY; // By default, we're going to play the memory game
 
   // Check to see if the lower right button is pressed
   byte buttonchoice = checkButton();
 
   if (buttonchoice == CHOICE_YELLOW) {
-    gameMode = MODE_BEEGEES;
+    gameMode = MODE_BEEGEES; 
     setLEDs(CHOICE_YELLOW);
     toner(CHOICE_YELLOW,150);
 
-    while(checkButton() != CHOICE_NONE) ;
+    while(checkButton() != CHOICE_NONE) ; //wait until the button has been released, mostly for consistant starting state.
 
   }
 
@@ -148,7 +150,7 @@ void setup()
     //Now do nothing. Battle mode will be serviced in the main routine
   }
 
-  else if(buttonchoice == CHOICE_BLUE) {
+  else if(buttonchoice == CHOICE_BLUE) { //same as the other two options above.
     gameMode = MODE_REVERSE;
     setLEDs(CHOICE_BLUE);
     toner(CHOICE_BLUE, 150);
@@ -160,7 +162,7 @@ void setup()
 
   play_winner(); // After setup is complete, say hello to the world
 
-  updateLCD();
+  updateLCD(); //turn the LCD on and write initial contidions.
 }
 
 void loop()
@@ -175,16 +177,17 @@ void loop()
   //setLEDs(CHOICE_OFF); // Turn off LEDs
   //delay(250);
 
+  /**
+  * Loop determins what needs to be run and runs it.
+  **/
   if (gameMode == MODE_MEMORY)
   {
     // Play memory game and handle result
-    
-    //displayName({'M','e','m','o','r','y'});
-    setLEDs(CHOICE_RED);
+    setLEDs(CHOICE_RED); //display the color of the game, based on color of button that is used to trigger the game
     delay(1000);
     setLEDs(CHOICE_OFF);
     delay(250);
-    if (play_memory() == true) {
+    if (play_memory() == true) { //play memory is the main code for the game, true is a win, false is a loss.
       play_winner(); // Player won, play winner tones
       numberOfGamesWon++;
     }
@@ -192,20 +195,24 @@ void loop()
       play_loser(); // Player lost, play loser tones
       numberOfGamesLost++;
     }
-    updateLCD();
+    updateLCD(); //update the LCD again to show the win/loss update
   }
 
   else if (gameMode == MODE_BATTLE)
-  {
-    setLEDs(CHOICE_GREEN);
+  { 
+    //battle uses global variables differently.
+    //numberOfGamesWon tracks player 1 wins
+    //numberOfGamesLost tracks player 2 wins
+    //updateLCDBattle is the custom display handler for the battle mode.
+    setLEDs(CHOICE_GREEN); 
     delay(1000);
     setLEDs(CHOICE_OFF);
     delay(250);
     play_battle(); // Play game until someone loses
-    if(turn) {
+    if(turn) { //turn == true for player 1
       numberOfGamesWon++;
-    } else {
-      numberOfGamesLost++;
+    } else { //turn == false for player 2
+      numberOfGamesLost++; 
     }
     play_loser(); // Player lost, play loser tones
     updateLCDBattle();
@@ -218,17 +225,17 @@ void loop()
     delay(250);
 
     play_beegees();
-    play_loser();
+    play_loser(); //you can never win with a buzzer.
     updateLCD();
 
   }
 
-  if(gameMode == MODE_REVERSE) {
-    setLEDs(CHOICE_BLUE);
+  if(gameMode == MODE_REVERSE) { //same as the memory
+    setLEDs(CHOICE_BLUE); 
     delay(1000);
     setLEDs(CHOICE_OFF);
     delay(250);
-    if(play_reverse()) {
+    if(play_reverse()) { //dropping '== true' because this is an if statemnt
       play_winner(); // Player won, play winner tones
       numberOfGamesWon++;
     } else {
@@ -247,6 +254,7 @@ void loop()
 // Returns 0 if player loses, or 1 if player wins
 boolean play_memory(void)
 {
+  updateLCD();
   randomSeed(millis()); // Seed the random generator with random amount of millis()
 
   gameRound = 0; // Reset the game to the beginning
@@ -274,7 +282,8 @@ boolean play_memory(void)
   return true; // Player made it through all the rounds to win!
 }
 
-boolean play_reverse(void) {
+boolean play_reverse(void) { //basically same code as memroy, see main for loop for difference.
+  updateLCD();
   randomSeed(millis()); // Seed the random generator with random amount of millis()
 
   gameRound = 0; // Reset the game to the beginning
@@ -286,6 +295,7 @@ boolean play_reverse(void) {
     playMoves(); // Play back the current game board
 
     // Then require the player to repeat the sequence.
+    //starts at the last position (marked by game rounts) and loops down till zero
     for (byte currentMove = gameRound ; currentMove > 0 ; currentMove--)
     {
       byte choice = wait_for_button(); // See what button the user presses
@@ -316,8 +326,8 @@ boolean play_battle(void)
   {
     byte newButton = wait_for_button(); // Wait for user to input next move
     gameBoard[gameRound++] = newButton; // Add this new button to the game array
-    turn = !turn;
-    lengthOfGame++;
+    turn = !turn; //swap players
+    lengthOfGame++; //inc length
     // Then require the player to repeat the sequence.
     updateLCDBattle();
     for (byte currentMove = 0 ; currentMove < gameRound ; currentMove++)
@@ -369,20 +379,6 @@ void add_to_moves(void)
 
 // Lights a given LEDs
 // Pass in a byte that is made up from CHOICE_RED, CHOICE_YELLOW, etc
-//integrate Charlieplex Here.
-
-//Changes:
-/*
-I, Alex, swapped the digitalWrite with charlie.charlieWrite
-All of the other code for this is the same.
-When looking at the same lines in the part one, or the example that this is copied from, 
-
-charlie.charlieWrite(LED_RED, HIGH);
-is 
-digitalWrite(ED_RED, HIGH);
-
-*/
-
 
 void setLEDs(byte leds)
 {
@@ -407,31 +403,7 @@ void setLEDs(byte leds)
   else
     charlie.charlieWrite(LED_YELLOW, LOW);
 }
-/*
-//This code will no longer function
-void setLEDs(byte leds)
-{
-  if ((leds & CHOICE_RED) != 0)
-    digitalWrite(LED_RED, HIGH);
-  else
-    digitalWrite(LED_RED, LOW);
 
-  if ((leds & CHOICE_GREEN) != 0)
-    digitalWrite(LED_GREEN, HIGH);
-  else
-    digitalWrite(LED_GREEN, LOW);
-
-  if ((leds & CHOICE_BLUE) != 0)
-    digitalWrite(LED_BLUE, HIGH);
-  else
-    digitalWrite(LED_BLUE, LOW);
-
-  if ((leds & CHOICE_YELLOW) != 0)
-    digitalWrite(LED_YELLOW, HIGH);
-  else
-    digitalWrite(LED_YELLOW, LOW);
-}
-*/
 
 // Wait for a button to be pressed. 
 // Returns one of LED colors (LED_RED, etc.) if successful, 0 if timed out
@@ -543,11 +515,8 @@ void winner_sound(void)
   {
     for (byte y = 0 ; y < 3 ; y++)
     {
-     // digitalWrite(BUZZER2, HIGH);
       digitalWrite(BUZZER1, LOW);
       delayMicroseconds(x);
-
-      //digitalWrite(BUZZER2, LOW);
       digitalWrite(BUZZER1, HIGH);
       delayMicroseconds(x);
     }
@@ -597,20 +566,20 @@ void attractMode(void)
 // The following functions are related to Beegees Easter Egg only
 
 // Notes in the melody. Each note is about an 1/8th note, "0"s are rests.
-int melody[] = {
+int melody[] = { //initial one give,
   NOTE_G4, NOTE_A4, 0, NOTE_C5, 0, 0, NOTE_G4, 0, 0, 0,
   NOTE_E4, 0, NOTE_D4, NOTE_E4, NOTE_G4, 0,
   NOTE_D4, NOTE_E4, 0, NOTE_G4, 0, 0,
   NOTE_D4, 0, NOTE_E4, 0, NOTE_G4, 0, NOTE_A4, 0, NOTE_C5, 0};
-int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370};
+int notes[13] = {370, 185, 277, 370, 415, 494, 277, 494, 466, 277, 466, 415, 370}; //fly me to the moon
 
-int Sweater[] = {
+int Sweater[] = { //ask sam
   0,0,0, NOTE_B5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5,
   NOTE_C5, NOTE_C5, 0, 0, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5,
   NOTE_D5, NOTE_D5, 0, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5
 };
 
-int axel_f[] = {
+int axel_f[] = { //the theam
   NOTE_F4, NOTE_F4, 0, 0, NOTE_GS4, NOTE_GS4, 0, NOTE_F4, 0, NOTE_F4, NOTE_AS4, 0, NOTE_F4, 0, NOTE_DS4, 0,
   NOTE_F4, NOTE_F4, 0, 0, NOTE_C5, NOTE_C5, 0, NOTE_F4, 0, NOTE_F4, NOTE_CS4, 0, NOTE_C5, 0, NOTE_GS4, 0,
   NOTE_F4, 0, NOTE_C5, 0, NOTE_F5, 0, NOTE_F4, NOTE_DS4, 0, NOTE_DS4, NOTE_C4, 0, NOTE_G4, 0,
@@ -646,26 +615,18 @@ void play_beegees()
   {
     gameNumber++;
     // iterate over the notes of the melody:
+    //for(int thisNote = 0; thisNote < sizeof(axel_f)/sizeof(axel_f[0]);thisNote++)
     for (int thisNote = 0; thisNote < axel_f_len; thisNote++) {
       changeLED();
-       //noTone(BUZZER1);
       if(axel_f[thisNote] == 0) {
         noTone(BUZZER1);
       }else {
         tone(BUZZER1, axel_f[thisNote]);
       }
       // to distinguish the notes, set a minimum time between them.
-      // the note's duration + 30% seems to work well:
-     
-
-
-      //tone(BUZZER1, notes[thisNote], 250);
+      // the note's duration + 30% seems to work well
       delay(pauseBetweenNote);
       haltStong = checkButton();
-      //delay(300);
-      // stop the tone playing:
-
-     
     }
     //noTone(BUZZER1);
     updateLCD();
@@ -681,7 +642,9 @@ void changeLED(void)
   if(LEDnumber > 3) LEDnumber = 0; // Wrap the counter if needed
 }
 
-//Controlling the LCD, or at least updating it
+//Controlling the LCD for all modes except battle
+//"Game: {} Len: {}"
+//"Won: {} Lost: {}"
 void updateLCD() {
   lcd.clear();
   lcd.setCursor(0,0);
@@ -697,15 +660,21 @@ void updateLCD() {
   lcd.print(numberOfGamesLost);
   
 }
-
+//Update for UpdateLCD to be useful with Battle.
+//"Game: {} Len: {}"
+//"P1: {} P2: {} Pt"
 void updateLCDBattle() {
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("Game: ");
   lcd.print(gameNumber);
   lcd.print(" Len: ");
-  lcd.print(lengthOfGame);
-
+  if (lengthOfGame -1<0) {
+    lcd.print(0);
+  }else {
+   lcd.print(lengthOfGame-1);
+  }
+  
   lcd.setCursor(0,1);
   lcd.print("P1: ");
   lcd.print(numberOfGamesWon);
@@ -715,10 +684,3 @@ void updateLCDBattle() {
   lcd.print("P");
   lcd.print(turn+1);
 }
-/*
-void displayName(String gameName[]) {
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print(gameName);
-}
-*/
