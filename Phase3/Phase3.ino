@@ -6,13 +6,13 @@
  This Simond Says Game is a version of Simond Says that has 4 modes. These four modes are Memory, Battle, Rewind, and Beegees.
 
  The Memory Mode starts when the red button is held while resetting the game.
- This mode displays a sequence of lights which increases each time the player succesfully reciprocates the sequence.
+ This mode displays a sequence of lights which increases each time the player successfully reciprocates the sequence.
 
  The Battle Mode starts when the green button is held while resetting the game.
  This mode has 2 players play against each other where each player takes turns building on the previous moves.
 
  The Rewind Mode starts when the blue button is held while resetting the game.
- This mode displays a sequence of lights which increases each time the player succesfully reciprocates opposite order of the sequence.
+ This mode displays a sequence of lights which increases each time the player successfully reciprocates opposite order of the sequence.
 
  The Beegees Mode starts when the yellow button is held while resetting the game.
  This mode displays a flash of lights and plays a set tune which we set as Axle F.
@@ -53,7 +53,7 @@
 #define MODE_REVERSE 4
 
 //Charlieplex
-//setup of the clarlie plexed LEDs, three pins for more than three combonations.
+//setup of the clarlie plexed LEDs, three pins for more than three combinations.
 byte LED_PIN_ONE = 7;
 byte LED_PIN_TWO = 8;
 byte LED_PIN_THREE = 9;
@@ -61,7 +61,7 @@ byte pins[] = {LED_PIN_ONE, LED_PIN_TWO, LED_PIN_THREE};
 
 Charlieplex charlie = Charlieplex(pins, sizeof(pins));
 
-charliePin LED_RED = {0, 1}; //refrence location in pins array, not pin location on board
+charliePin LED_RED = {0, 1}; //reference location in pins array, not pin location on board
 charliePin LED_GREEN = {1, 0};
 charliePin LED_YELLOW = {2, 1};
 charliePin LED_BLUE = {1, 2};
@@ -80,7 +80,7 @@ bool turn = false; //false == player_1, true==player_2
 // Game state variables
 byte gameMode = MODE_MEMORY; //By default, let's play the memory game
 byte gameBoard[32]; //Contains the combination of buttons as we advance
-byte gameRound = 0; //Counts the number of succesful rounds the player has made it through
+byte gameRound = 0; //Counts the number of successful rounds the player has made it through
 
 void setup()
 {
@@ -118,7 +118,7 @@ void setup()
     setLEDs(CHOICE_YELLOW);
     toner(CHOICE_YELLOW,150);
 
-    while(checkButton() != CHOICE_NONE) ; //wait until the button has been released, mostly for consistant starting state.
+    while(checkButton() != CHOICE_NONE) ; //wait until the button has been released, mostly for consistent starting state.
 
   }
 
@@ -151,7 +151,7 @@ void setup()
 
   play_winner(); // After setup is complete, say hello to the world
 
-  updateLCD(); //turn the LCD on and write initial contidions.
+  updateLCD(); //turn the LCD on and write initial conditions.
 }
 
 void loop()
@@ -167,7 +167,7 @@ void loop()
   //delay(250);
 
   /**
-  * Loop determins what needs to be run and runs it.
+  * Loop determines what needs to be run and runs it.
   **/
   if (gameMode == MODE_MEMORY)
   {
@@ -224,7 +224,7 @@ void loop()
     delay(1000);
     setLEDs(CHOICE_OFF);
     delay(250);
-    if(play_reverse()) { //dropping '== true' because this is an if statemnt
+    if(play_reverse()) { //dropping '== true' because this is an if statement
       play_winner(); // Player won, play winner tones
       numberOfGamesWon++;
     } else {
@@ -261,7 +261,7 @@ boolean play_memory(void)
 
       if (choice == 0) return false; // If wait timed out, player loses
 
-      if (choice != gameBoard[currentMove]) return false; // If the choice is incorect, player loses
+      if (choice != gameBoard[currentMove]) return false; // If the choice is incorrect, player loses
     }
     lengthOfGame++;
     updateLCD();
@@ -271,7 +271,7 @@ boolean play_memory(void)
   return true; // Player made it through all the rounds to win!
 }
 
-boolean play_reverse(void) { //basically same code as memroy, see main for loop for difference.
+boolean play_reverse(void) { //basically same code as memory, see main for loop for difference.
   updateLCD();
   randomSeed(millis()); // Seed the random generator with random amount of millis()
 
@@ -284,14 +284,14 @@ boolean play_reverse(void) { //basically same code as memroy, see main for loop 
     playMoves(); // Play back the current game board
 
     // Then require the player to repeat the sequence.
-    //starts at the last position (marked by game rounts) and loops down till zero
+    //starts at the last position (marked by game rounds) and loops down till zero
     for (byte currentMove = gameRound ; currentMove > 0 ; currentMove--)
     {
       byte choice = wait_for_button(); // See what button the user presses
 
       if (choice == 0) return false; // If wait timed out, player loses
 
-      if (choice != gameBoard[currentMove-1]) return false; // If the choice is incorect, player loses
+      if (choice != gameBoard[currentMove-1]) return false; // If the choice is incorrect, player loses
     }
     lengthOfGame++;
     updateLCD();
@@ -325,7 +325,7 @@ boolean play_battle(void)
 
       if (choice == 0) return false; // If wait timed out, player loses.
 
-      if (choice != gameBoard[currentMove]) return false; // If the choice is incorect, player loses.
+      if (choice != gameBoard[currentMove]) return false; // If the choice is incorrect, player loses.
     }
 
     delay(100); // Give the user an extra 100ms to hand the game to the other player
@@ -352,7 +352,7 @@ void playMoves(void)
 // Adds a new random button to the game sequence, by sampling the timer
 void add_to_moves(void)
 {
-  byte newButton = random(0, 4); //min (included), max (exluded)
+  byte newButton = random(0, 4); //min (included), max (excluded)
 
   // We have to convert this number, 0 to 3, to CHOICEs
   if(newButton == 0) newButton = CHOICE_RED;
@@ -410,7 +410,7 @@ byte wait_for_button(void)
 
       while(checkButton() != CHOICE_NONE) ;  // Now let's wait for user to release button
 
-      delay(10); // This helps with debouncing and accidental double taps
+      delay(10); // This helps with denouncing and accidental double taps
 
       return button;
     }
@@ -568,7 +568,7 @@ int Sweater[] = { //ask sam
   NOTE_D5, NOTE_D5, 0, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_B5, NOTE_D5
 };
 
-int axel_f[] = { //the theam
+int axel_f[] = { //the theme
   NOTE_F4, NOTE_F4, 0, 0, NOTE_GS4, NOTE_GS4, 0, NOTE_F4, 0, NOTE_F4, NOTE_AS4, 0, NOTE_F4, 0, NOTE_DS4, 0,
   NOTE_F4, NOTE_F4, 0, 0, NOTE_C5, NOTE_C5, 0, NOTE_F4, 0, NOTE_F4, NOTE_CS4, 0, NOTE_C5, 0, NOTE_GS4, 0,
   NOTE_F4, 0, NOTE_C5, 0, NOTE_F5, 0, NOTE_F4, NOTE_DS4, 0, NOTE_DS4, NOTE_C4, 0, NOTE_G4, 0,
