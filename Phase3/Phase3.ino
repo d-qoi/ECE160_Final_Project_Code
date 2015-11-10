@@ -1,32 +1,21 @@
 /*
- SparkFun Inventor's Kit
- Example sketch 16
- Spark Fun Electronics
- Oct. 7, 2014
+ TheAzureLionsFinalProjectPhase3
+ The Azure Lions- Jonathan Lawson, Alexander Hirschfeld, Samuel Goben
+ Nov. 15, 2015
 
- Simond Says is a memory game. Start this game by pressing one of the four buttons. When a button lights up, 
- press the button, reversing the sequence. The sequence will get longer and longer. This game is won after 
- 72 rounds.
- 
- Generates random sequence, plays music, and displays button lights.
+ This Simond Says Game is a version of Simond Says that has 4 modes. These four modes are Memory, Battle, Rewind, and Beegees.
 
- Simon tones from Wikipedia
- - A (red, upper left) - 440Hz - 2.272ms - 1.136ms pulse
- - a (green, upper right, an octave higher than A) - 880Hz - 1.136ms,
- 0.568ms pulse
- - D (blue, lower left, a perfect fourth higher than the upper left) 
- 587.33Hz - 1.702ms - 0.851ms pulse
- - G (yellow, lower right, a perfect fourth higher than the lower left) - 
- 784Hz - 1.276ms - 0.638ms pulse
+ The Memory Mode starts when the red button is held while resetting the game.
+ This mode displays a sequence of lights which increases each time the player succesfully reciprocates the sequence.
 
- Simon Says game originally written in C for the PIC16F88.
- Ported for the ATmega168, then ATmega328, then Arduino 1.0.
- Fixes and cleanup by Joshua Neal <joshua[at]trochotron.com>
+ The Battle Mode starts when the green button is held while resetting the game.
+ This mode has 2 players play against each other where each player takes turns building on the previous moves.
 
- This sketch was written by SparkFun Electronics,
- with lots of help from the Arduino community.
- This code is completely free for any use.
- Visit http://www.arduino.cc to learn about the Arduino.
+ The Rewind Mode starts when the blue button is held while resetting the game.
+ This mode displays a sequence of lights which increases each time the player succesfully reciprocates opposite order of the sequence.
+
+ The Beegees Mode starts when the yellow button is held while resetting the game.
+ This mode displays a flash of lights and plays a set tune which we set as Axle F.
  */
 
 /*************************************************
